@@ -1,9 +1,9 @@
-import { $data, $find, $has, $classed, $text, $value } from './helpers';
+import { $classed, $data, $find, $has, $map, $text, $value } from './helpers';
 
 const cls = (ctx) => ['bug', 'chore', 'feature', 'release'].find((c) => $classed(ctx, c));
 
 function multiple(elements, collapsed) {
-  return elements.map((i, story) => {
+  return $map(elements, (i, story) => {
     const id = $data(story, 'id').toString();
 
     const title = collapsed
@@ -13,7 +13,7 @@ function multiple(elements, collapsed) {
     const type = cls(story);
 
     return { id, title, type };
-  }).get();
+  });
 }
 
 const adapter = {
@@ -34,6 +34,10 @@ const adapter = {
       const title = $text('.editor.name', story);
       const type = cls(story);
       const tickets = [{ id, title, type }];
+      return fn(null, tickets);
+    } else if ($has('div.story', doc)) { // any story
+      const selection = $find('div.story', doc).closest('.story');
+      const tickets = multiple(selection, true);
       return fn(null, tickets);
     }
 
